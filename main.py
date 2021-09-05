@@ -71,6 +71,8 @@ if __name__ == "__main__":
                         help='Введите шаги, например: l,r,u,d или  lrud')
     parser.add_argument('-m', '--maze', dest='maze', default='a', choices=['a', 'b', 'c'], type=str,
                         help='Выберите тип лабиринта: a, b или c')
+    parser.add_argument('-d', '--debug', dest='debug', action='store_true',
+                        help='Вывод отладочно информации')
     args = parser.parse_args()
 
     way_list = re.findall('[u]|[r]|[l]|[d]', args.way)
@@ -78,7 +80,8 @@ if __name__ == "__main__":
     zero_point = labyrinth['zero_p']
     finish = labyrinth['finish']
 
-    print(labyrinth,'\n', zero_point, '\n', way_list)
+    if args.debug:
+        print(f'way_list: {way_list} \nlabyrinth: {labyrinth} \nzero_point: {zero_point}')
 
     new_p = steper(labyrinth['type'], zero_point, way_list)
     print(f'Your position {new_p}')
