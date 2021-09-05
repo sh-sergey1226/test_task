@@ -33,53 +33,21 @@
 затраченному времени момент Мы с интересом просмотрим Ваше решение, даже если не все пункты будут выполнены. Также, если у Вас
 возникнут вопросы по условиям задания, то не стесняйтесь написать нам!'''
 
+import argparse
+from maze_templates import *
 
-f = None
-
-zero_point= (0, 0)
-
-labyrinth = ((0, 3), (1, 3), (2, 3), (3, 3),
-             (0, 2), (1, 2), (2, 2), (3, 2),
-             (0, 1), (1, 1), (2, 1), (3, 1),
-             (0, 0), (1, 0), (2, 0), (3, 0))
-
-labyrinth2 = ((0, 3), (1, 3), (2, 3), (3, 3),
-              (0, 2), (f, f), (f, f), (3, 2),
-              (0, 1), (f, f), (f, f), (3, 1),
-              (0, 0), (1, 0), (f, f), (3, 0))
+maze_dict = {
+            'a':{'type':a, 'zero_p':zero_point_a, 'finish':finish_a},
+            'b':{'type':b, 'zero_p':zero_point_b, 'finish':finish_b},
+            'c':{'type':c, 'zero_p':zero_point_c, 'finish':finish_c},
+}
+maze = ''
+labyrinth = maze_dict[maze]
+zero_point = labyrinth['zero_p']
+finish = labyrinth['finish']
 
 way = ['u','r','d', 'l', 'd', 'l', 'u', 'r', 'u', 'r']
 new_point = []
-# x, y = zero_point[0], zero_point[1]
-#
-# for step in way:
-#     if step == 'u':
-#         y += 1
-#         if (x,y) in labyrinth2:
-#             new_point = [x, y]
-#         else:
-#             y-=1
-#     if step == 'r':
-#         x +=1
-#         if (x,y) in labyrinth2:
-#             new_point = [x, y]
-#         else:
-#             x -= 1
-#     if step == 'd':
-#         y -= 1
-#         if (x,y) in labyrinth2:
-#             new_point = [x, y]
-#         else:
-#             y += 1
-#     if step == 'l':
-#         x -=1
-#         if (x,y) in labyrinth2:
-#             new_point = [x, y]
-#         else:
-#             x += 1
-#
-# print('simple loop', new_point)
-
 
 def move(point, course, lab):
     x, y = point[0], point[1]
@@ -97,15 +65,22 @@ def move(point, course, lab):
 def steper(lab, z_point, way):
     if len(way) == 1:
         new_position = move(z_point,way, lab)
-        print('recurs func', new_position)
         return new_position
     else:
         step = way.pop(0)
         new_position = move(z_point, step, lab)
         steper(lab, new_position, way)
 
-steper(labyrinth2, zero_point, way)
 
+parser = argparse.ArgumentParser(description='Great Description To Be Here')
+parser.add_argument('-w', dest=way, help='Введите шаги через ","')
+parser.add_argument('-m', dest=maze, help='Выберите тип лабиринта: a, b, c')
 
 if __name__ == "__main__":
-    steper()
+    new_p = steper(labyrinth, zero_point, way)
+    if new_p == finish:
+        print('You win')
+    else:
+        print(f'Finish {finish}')
+        print(f'Your position {new_p}')
+
