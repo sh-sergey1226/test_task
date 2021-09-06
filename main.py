@@ -59,7 +59,7 @@ if __name__ == "__main__":
     import argparse
     from maze_templates import *
     import re
-
+    from graph_pic import *
     maze_dict = {
         'a': {'type': a, 'zero_p': zero_point_a, 'finish': finish_a},
         'b': {'type': b, 'zero_p': zero_point_b, 'finish': finish_b},
@@ -84,6 +84,7 @@ if __name__ == "__main__":
         print(f'way_list: {way_list} \nlabyrinth: {labyrinth} \nzero_point: {zero_point}')
 
     new_p = steper(labyrinth['type'], zero_point, way_list)
+    create_pict(labyrinth['type'])
     print(f'Your position {new_p}')
     #
     # if tuple(new_p) == finish:
