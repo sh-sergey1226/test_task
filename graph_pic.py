@@ -5,7 +5,7 @@ root = Tk()
 pics = Canvas(root, width=500, height=500, bg='white')
 pics.pack()
 
-def create_pict(maze):
+def create_pict(maze, position):
     for i in maze:
         x, y = i[0], i[1]
         x1 = 100+50*x
@@ -40,9 +40,12 @@ def create_pict(maze):
                        width=2,
                        activedash=(5, 4))
 
+    label = Label(text=f"Your position {position}")
+    label.pack()
     root.mainloop()
 
 
 if __name__ == '__main__':
     maze = a
-    create_pict(maze)
+    position = 'default'
+    create_pict(maze, position)
