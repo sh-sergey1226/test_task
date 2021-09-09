@@ -1,3 +1,9 @@
+#!python
+
+import argparse
+from maze_templates import *
+from re import findall
+from graph_pic import *
 
 def move(point, course, lab):
     x, y = point[0], point[1]
@@ -22,17 +28,14 @@ def steper(lab, z_point, way):
         return steper(lab, new_position, way)
 
 if __name__ == "__main__":
-    import argparse
-    from maze_templates import *
-    from re import findall
-    from graph_pic import *
+
     maze_dict = {
         'a': {'type': a, 'zero_p': zero_point_a, 'finish': finish_a},
         'b': {'type': b, 'zero_p': zero_point_b, 'finish': finish_b},
         'c': {'type': c, 'zero_p': zero_point_c, 'finish': finish_c},
     }
 
-    parser = argparse.ArgumentParser(description='Great Description To Be Here')
+    parser = argparse.ArgumentParser(description='Навигация по лабиринту')
     parser.add_argument('-w', '--way', dest='way', default='r,u', type=str,
                         help='Введите шаги, например: l,r,u,d или  lrud')
     parser.add_argument('-m', '--maze', dest='maze', default='a', choices=['a', 'b', 'c'], type=str,
@@ -40,7 +43,7 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', dest='debug', action='store_true',
                         help='Вывод отладочной информации')
     parser.add_argument('-p', '--pict', dest='pict', action='store_true',
-                        help='Вывод отладочно информации')
+                        help='Вывод изображения лабиринта')
 
     args = parser.parse_args()
 
