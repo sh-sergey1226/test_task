@@ -1,4 +1,11 @@
+#!python
 
+import argparse
+from maze_templates import *
+from re import findall
+from graph_pic import *
+
+#функция, которая вычисляет конечную точку после шага, проверяет если ли рядом секция, доступная для перехода
 def move(point, course, lab):
     x, y = point[0], point[1]
     if course == 'r' and (point[0]+1, point[1]) in lab:
@@ -12,6 +19,7 @@ def move(point, course, lab):
     new_point = [x, y]
     return new_point
 
+#рекурсиваня функция, которая обходит все шаги в пути
 def steper(lab, z_point, way):
     if len(way) == 1:
         new_position = move(z_point,way[0], lab)
@@ -22,17 +30,14 @@ def steper(lab, z_point, way):
         return steper(lab, new_position, way)
 
 if __name__ == "__main__":
-    import argparse
-    from maze_templates import *
-    from re import findall
-    from graph_pic import *
+
     maze_dict = {
         'a': {'type': a, 'zero_p': zero_point_a, 'finish': finish_a},
         'b': {'type': b, 'zero_p': zero_point_b, 'finish': finish_b},
         'c': {'type': c, 'zero_p': zero_point_c, 'finish': finish_c},
     }
-
-    parser = argparse.ArgumentParser(description='Great Description To Be Here')
+    #парсим аргументы, передаваемые при вызове программы
+    parser = argparse.ArgumentParser(description='Навигация по лабиринту')
     parser.add_argument('-w', '--way', dest='way', default='r,u', type=str,
                         help='Введите шаги, например: l,r,u,d или  lrud')
     parser.add_argument('-m', '--maze', dest='maze', default='a', choices=['a', 'b', 'c'], type=str,
@@ -40,10 +45,11 @@ if __name__ == "__main__":
     parser.add_argument('-d', '--debug', dest='debug', action='store_true',
                         help='Вывод отладочной информации')
     parser.add_argument('-p', '--pict', dest='pict', action='store_true',
-                        help='Вывод отладочно информации')
+                        help='Вывод изображения лабиринта')
 
     args = parser.parse_args()
 
+    #выбираем из строки, переданный в way символы u r d l
     way_list = findall('[u]|[r]|[l]|[d]', args.way)
     labyrinth = maze_dict[args.maze]
     zero_point = labyrinth['zero_p']
@@ -54,6 +60,6 @@ if __name__ == "__main__":
 
     new_p = steper(labyrinth['type'], zero_point, way_list)
     if args.pict:
-        create_pict(labyrinth['type'], new_p)
+        create_pict(labyrinth['type'], new_p, timeout=5000)
     print(f'Your position {new_p}')
 
