@@ -1,3 +1,9 @@
+"""модуль, который строит изображение лабиринта по координатам
+на вход принимает
+maze -тип лабиринта из maze_templates.py,
+position - опциональный аргумент, выводит координаты позиции
+timeout - время существования окна до закрытия в мс"""
+
 from tkinter import *
 from maze_templates import *
 
@@ -5,7 +11,7 @@ root = Tk()
 pics = Canvas(root, width=500, height=500, bg='white')
 pics.pack()
 
-def create_pict(maze, position):
+def create_pict(maze, position='', timeout=10000):
     for i in maze:
         x, y = i[0], i[1]
         x1 = 100+50*x
@@ -42,6 +48,7 @@ def create_pict(maze, position):
 
     label = Label(text=f"Your position {position}")
     label.pack()
+    root.after(timeout, lambda: root.destroy())
     root.mainloop()
 
 

@@ -1,11 +1,11 @@
+"""запуск тестов через pytest
+pytest test_file.py"""
+
 
 import pytest
-from subprocess import Popen, PIPE, TimeoutExpired
-from os import mkdir, getpid, chdir
-from os.path import join
-from main import steper, move
-from graph_pic import root
-
+from subprocess import Popen, PIPE
+from os import chdir
+from main import steper
 
 maze1 = ((0,0),(0,1),(3,3))
 maze2 = ((0,0),(1,0),(3,3))
@@ -17,16 +17,15 @@ w_dict = {maze1: 'u', maze2:'r', maze3: 'd', maze4: 'l', 'ways': ['u','u','u','r
 way1 = '!@#$%^&*()_+'
 way2 = '🔥 💣 💥 🧨 🤔 🔎'
 way3 = ' k f w e q v'
-way4 = 'u/l/d/r/t/y/r/d/u'
-way5 = 'u r d l '
-way6 = ''
+way4 = 'u r d l '
+way5 = ''
 
 
 class TestMainPage1():
+
     @classmethod
     def setup_class(self):
         chdir(r'C:\Users\MONOLIT\PycharmProjects\test_chellenge')
-
 
     def test_correct_result(self):
         """выдача корректного результата при задании шага"""
@@ -43,7 +42,7 @@ class TestMainPage1():
         assert result == list(maze4[1])
 
     def going_beyond_the_maze(self):
-        """выход за пределы лабиринта"""
+        """выдача корректного результата при попытке выхода за пределы лабиринта"""
         result = steper(maze1, z_point, w_dict['ways'])
         assert result == list(maze1[1])
 
@@ -57,7 +56,13 @@ class TestMainPage1():
         assert result == list(maze4[0])
 
     def test_arguments(self):
-        """корректная работа аргументов"""
+        """корректная работа аргументов, которые принимают параметры
+        -m аргумент должен принимать только типы лабиринтов a,b bли с
+        -w принимает любую строку, содержащую буквы u,r,l,d, разделителем может быть
+        печатный символ ASCII, кроме пробела, также можно передавать в виде непустого списка, кортежа, словаря.
+        -d не принимает параметры, выводит отладочную информацию
+        -p не принимает аргументы, выводит изображение лабиринта"""
+
         cmd = '-m a'
         out, err = self.call_file(cmd)
         print(out)
@@ -83,24 +88,41 @@ class TestMainPage1():
         print(out)
         assert out == b'Your position [2, 0]\r\n'
 
+        cmd = '-w u/l/d/r/t/y/r/d/u'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert out == b'Your position [2, 0]\r\n'
+
+        cmd = '-w [u,r]'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert out == b'Your position [1, 0]\r\n'
+
+        cmd = '-w (u,r)'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert out == b'Your position [1, 0]\r\n'
+
+        cmd = "-w {1:'u',2:'r'}"
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert out == b'Your position [1, 0]\r\n'
+
         cmd = '-d'
         out, err = self.call_file(cmd)
+        print(out)
         assert out == b"way_list: ['r', 'u'] \r\n" \
                       b"labyrinth: {'type': ((1, 1), (0, 0), (1, 0), (2, 0)), 'zero_p': (0, 0), 'finish': (1, 1)} \r\n" \
                       b"zero_point: (0, 0)\r\n" \
                       b"Your position [1, 1]\r\n"
 
-        cmd = 'python main.py'
+        cmd = 'python main.py -p'
+        """корректный результат - открылось окно tk с лабиринтом, проверка глазами"""
         proc = Popen(cmd, shell=True, stdout=PIPE, stderr=PIPE)
-        assert 'normal' == root.state()
-        root.destroy()
-        try:
-            proc.communicate(timeout=3)
-        except TimeoutExpired:
-            proc.kill()
-            proc.wait(timeout=3)
 
     def test_incorrect_maze_type(self):
+        """передача символов кириллицы, буквы, отличной от 'a', 'b', 'c', а также пустого/не пустого списка,
+        кортежа, словаря как параметра типа лабиринта"""
         cmd = '-m а'
         out, err = self.call_file(cmd)
         print(out, err)
@@ -118,9 +140,44 @@ class TestMainPage1():
         assert err == b"usage: main.py [-h] [-w WAY] [-m {a,b,c}] [-d] [-p]\r\n" \
                       b"main.py: error: argument -m/--maze: invalid choice: 'q' (choose from 'a', 'b', 'c')\r\n"
 
+        cmd = '-m []'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert err == b"usage: main.py [-h] [-w WAY] [-m {a,b,c}] [-d] [-p]\r\n" \
+                      b"main.py: error: argument -m/--maze: invalid choice: '[]' (choose from 'a', 'b', 'c')\r\n"
+
+        cmd = '-m {}'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert err == b"usage: main.py [-h] [-w WAY] [-m {a,b,c}] [-d] [-p]\r\n" \
+                      b"main.py: error: argument -m/--maze: invalid choice: '{}' (choose from 'a', 'b', 'c')\r\n"
+
+        cmd = '-m ()'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert err == b"usage: main.py [-h] [-w WAY] [-m {a,b,c}] [-d] [-p]\r\n" \
+                      b"main.py: error: argument -m/--maze: invalid choice: '()' (choose from 'a', 'b', 'c')\r\n"
+
+        cmd = '-m [a]'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert err == b"usage: main.py [-h] [-w WAY] [-m {a,b,c}] [-d] [-p]\r\n" \
+                      b"main.py: error: argument -m/--maze: invalid choice: '[a]' (choose from 'a', 'b', 'c')\r\n"
+
+        cmd = "-m {1:1}"
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert err == b"usage: main.py [-h] [-w WAY] [-m {a,b,c}] [-d] [-p]\r\n" \
+                      b"main.py: error: argument -m/--maze: invalid choice: '{1:1}' (choose from 'a', 'b', 'c')\r\n"
+
+        cmd = '-m (a)'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert err == b"usage: main.py [-h] [-w WAY] [-m {a,b,c}] [-d] [-p]\r\n" \
+                      b"main.py: error: argument -m/--maze: invalid choice: '(a)' (choose from 'a', 'b', 'c')\r\n"
+
     def test_incorrect_way(self):
-        """передача невалидного пути"""
-        # with pytest.raises(IndexError):
+        """передача невалидной строки, содержащей пробелы, символы юникод, отсутствие букв u,r,l,d как параметр пути"""
         cmd = '-w '+way1
         out, err = self.call_file(cmd)
         print(out, err)
@@ -139,17 +196,27 @@ class TestMainPage1():
         cmd = '-w '+way4
         out, err = self.call_file(cmd)
         print(out, err)
-        assert out == b'Your position [2, 0]\r\n'
+        assert b'error: unrecognized arguments: r d l\r\n' in err
 
         cmd = '-w '+way5
         out, err = self.call_file(cmd)
         print(out, err)
-        assert b'error: unrecognized arguments: r d l\r\n' in err
+        assert b'expected one argument' in err
 
-        cmd = '-w '+way6
+        cmd = '-w []'
         out, err = self.call_file(cmd)
         print(out, err)
-        assert b'expected one argument' in err
+        assert b'IndexError: pop from empty list' in err
+
+        cmd = '-w {}'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert b'IndexError: pop from empty list' in err
+
+        cmd = '-w ()'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert b'IndexError: pop from empty list' in err
 
     def test_incorrect_parameters_of_arguments(self):
         """передача параметров в аргументы, которые их не принимают"""
