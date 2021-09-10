@@ -2,7 +2,6 @@
 pytest test_file.py"""
 
 
-import pytest
 from subprocess import Popen, PIPE
 from os import chdir
 from main import steper
@@ -139,6 +138,12 @@ class TestMainPage1():
         print(out, err)
         assert err == b"usage: main.py [-h] [-w WAY] [-m {a,b,c}] [-d] [-p]\r\n" \
                       b"main.py: error: argument -m/--maze: invalid choice: 'q' (choose from 'a', 'b', 'c')\r\n"
+
+        cmd = '-m aa'
+        out, err = self.call_file(cmd)
+        print(out, err)
+        assert err == b"usage: main.py [-h] [-w WAY] [-m {a,b,c}] [-d] [-p]\r\n" \
+                      b"main.py: error: argument -m/--maze: invalid choice: 'aa' (choose from 'a', 'b', 'c')\r\n"
 
         cmd = '-m []'
         out, err = self.call_file(cmd)
